@@ -47,9 +47,3 @@ function draw() {
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
-
-//--------------------------------------------------//
-
-function mouseClicked() {
-  save("export.png");
-}
