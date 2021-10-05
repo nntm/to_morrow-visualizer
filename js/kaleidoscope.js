@@ -1,14 +1,16 @@
-let RADIUS = 200;
+let COL = 12;
+let ROW = 8;
+
+let RADIUS = 50;
 let VERTICES = 6;
-let PALETTE;
-let OPACITY = 0.35;
-let PETAL_PHASE = 30;
-let COLOR_PHASE = 60;
-let MAX_PETAL_SIZE = 360;
-let MAX_PETAL_LIFESPAN = 400;
+let OPACITY = [0.5, 0.15];
+let PETAL_PHASE = [60, 15];
+let COLOR_PHASE = [80, 30];
+let MAX_PETAL_SIZE = RADIUS * 2;
+let PETAL_LIFESPAN = [550, 250];
 let MAX_NOISE_SEED = 10000;
-let NOISE_SEGMENT = 0.1;
-let NOISE_INCREMENT = 0.004;
+let NOISE_SEGMENT = [0.05, 0.4];
+let NOISE_MAP_INCREMENT = [0.001, 0.01];
 
 //--------------------------------------------------//
 
@@ -18,33 +20,80 @@ class Kaleidoscope {
     this.vertices = vertices;
     this.maxPetalSize = maxPetalSize;
 
+    // constants
+    this.levelOfDetails = random(1);
+    this.opacity = map(this.levelOfDetails, 0, 1, OPACITY[0], OPACITY[1]);
+    this.petalPhase = map(
+      this.levelOfDetails,
+      0,
+      1,
+      PETAL_PHASE[0],
+      PETAL_PHASE[1]
+    );
+    //console.log(this.petalPhase);
+    this.colorPhase = map(
+      this.levelOfDetails,
+      0,
+      1,
+      COLOR_PHASE[0],
+      COLOR_PHASE[1]
+    );
+    //console.log(this.colorPhase);
+
+    colorMode(RGB, 255, 255, 255, 1);
+    this.colors = [
+      color(random(255), random(255), random(255), this.opacity),
+      color(random(255), random(255), random(255), this.opacity),
+      color(random(255), random(255), random(255), this.opacity),
+    ];
+
+    this.bpm = random(1);
+    this.petalLifespan = map(
+      this.bpm,
+      0,
+      1,
+      PETAL_LIFESPAN[0],
+      PETAL_LIFESPAN[1]
+    );
+    //console.log(this.petalLifespan);
+    this.noiseSegment = map(this.bpm, 0, 1, NOISE_SEGMENT[0], NOISE_SEGMENT[1]);
+    //console.log(this.noiseSegment);
+    this.noiseMapIncrement = map(
+      this.bpm,
+      0,
+      1,
+      NOISE_MAP_INCREMENT[0],
+      NOISE_MAP_INCREMENT[1]
+    );
+    //console.log(this.noiseMapIncrement);
+
     this.petalPhaseCount = 0;
     this.petals = [];
 
     this.colorPhaseCount = 0;
     this.currentColorIndex = 0;
 
-    this.noiseY = 0;
+    this.noisePos = 0;
   }
 
   run() {
     this.noiseSeed = int(random(MAX_NOISE_SEED));
-    this.noiseY += NOISE_INCREMENT;
+    this.noisePos += this.noiseMapIncrement;
 
-    if (this.petalPhaseCount++ >= PETAL_PHASE) {
-      let color1 = PALETTE[this.currentColorIndex];
+    if (this.petalPhaseCount++ >= this.petalPhase) {
+      let color1 = this.colors[this.currentColorIndex];
       let color2;
-      if (this.currentColorIndex < PALETTE.length - 1) {
-        color2 = PALETTE[this.currentColorIndex + 1];
+      if (this.currentColorIndex < this.colors.length - 1) {
+        color2 = this.colors[this.currentColorIndex + 1];
       } else {
-        color2 = PALETTE[0];
+        color2 = this.colors[0];
       }
 
       this.addPetal(
         lerpColor(
           color1,
           color2,
-          map(this.colorPhaseCount, 0, COLOR_PHASE, 0, 1)
+          map(this.colorPhaseCount, 0, this.colorPhase, 0, 1)
         ),
         this.radius,
         this.maxPetalSize,
@@ -54,17 +103,17 @@ class Kaleidoscope {
       this.petalPhaseCount = 0;
     }
 
-    if (this.colorPhaseCount++ >= COLOR_PHASE) {
+    if (this.colorPhaseCount++ >= this.colorPhase) {
       this.colorPhaseCount = 0;
 
-      if (this.currentColorIndex++ >= PALETTE.length - 1) {
+      if (this.currentColorIndex++ >= this.colors.length - 1) {
         this.currentColorIndex = 0;
       }
     }
 
     for (let i = this.petals.length - 1; i >= 0; i--) {
       let petal = this.petals[i];
-      petal.update(this.noiseY);
+      petal.update(this.noisePos);
 
       if (petal.isDead) {
         this.petals.splice(i, 1);
@@ -86,7 +135,15 @@ class Kaleidoscope {
   }
 
   addPetal(color, kRadius, maxSize, noiseSeed) {
-    let petal = new Petal(0, color, kRadius, maxSize, noiseSeed);
+    let petal = new Petal(
+      0,
+      color,
+      kRadius,
+      maxSize,
+      this.petalLifespan,
+      noiseSeed,
+      this.noiseSegment
+    );
     this.petals.push(petal);
   }
 
@@ -98,7 +155,15 @@ class Kaleidoscope {
 //--------------------------------------------------//
 
 class Petal {
-  constructor(x, color, kRadius, maxSize, noiseSeed) {
+  constructor(
+    x,
+    color,
+    kRadius,
+    maxSize,
+    maxLifespan,
+    noiseSeed,
+    noiseSegment
+  ) {
     this.x = x;
     this.color = color;
 
@@ -108,24 +173,32 @@ class Petal {
     this.maxSize = maxSize;
     this.isRect = round(random(1)) == 0 ? true : false;
 
-    this.lifespan = MAX_PETAL_LIFESPAN;
+    this.maxLifespan = maxLifespan;
+    this.lifespan = this.maxLifespan;
     this.isDead = false;
 
     this.noiseSeed = noiseSeed;
+    this.noiseSegment = noiseSegment;
   }
 
-  update(n) {
+  update(noisePos) {
     if (this.lifespan >= 0) {
-      this.x = map(this.lifespan, MAX_PETAL_LIFESPAN, 0, 0, 1) * this.kRadius;
+      this.x = map(this.lifespan, this.maxLifespan, 0, 0, 1) * this.kRadius;
 
       this.width =
-        sin(map(this.lifespan, MAX_PETAL_LIFESPAN, 0, TWO_PI, 0)) *
-        noise(map(this.lifespan, MAX_PETAL_LIFESPAN, 0, 0, NOISE_SEGMENT), n) *
+        sin(map(this.lifespan, this.maxLifespan, 0, TWO_PI, 0)) *
+        noise(
+          map(this.lifespan, this.maxLifespan, 0, 0, this.noiseSegment),
+          noisePos
+        ) *
         this.maxSize;
 
       this.height =
-        sin(map(this.lifespan, MAX_PETAL_LIFESPAN, 0, PI * 3, PI)) *
-        noise(n, map(this.lifespan, MAX_PETAL_LIFESPAN, 0, 0, NOISE_SEGMENT)) *
+        sin(map(this.lifespan, this.maxLifespan, 0, PI * 3, PI)) *
+        noise(
+          noisePos,
+          map(this.lifespan, this.maxLifespan, 0, 0, this.noiseSegment)
+        ) *
         this.maxSize;
 
       this.lifespan--;
