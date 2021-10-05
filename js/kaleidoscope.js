@@ -1,7 +1,7 @@
-let COL = 5;
-let ROW = 3;
+let COL = 1;
+let ROW = 1;
 
-let RADIUS = 100;
+let RADIUS = 200;
 let VERTICES = 6;
 let OPACITY = [0.5, 0.15];
 let PETAL_PHASE = [60, 15];
