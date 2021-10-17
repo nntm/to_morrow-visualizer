@@ -1,6 +1,6 @@
 let modules;
 
-let TOTAL_MODULES = 500;
+let TOTAL_MODULES = 61;
 let ARTWORK_RINGS = countRings(TOTAL_MODULES);
 
 //--------------------------------------------------//
@@ -8,6 +8,12 @@ let ARTWORK_RINGS = countRings(TOTAL_MODULES);
 function setup() {
   createCanvas(windowWidth, windowHeight);
   createModules();
+  frameRate(30);
+
+  rectMode(CENTER);
+  ellipseMode(CENTER);
+
+  strokeCap(SQUARE);
 }
 
 //--------------------------------------------------//
@@ -21,9 +27,11 @@ function draw() {
   for (let i = 0; i < TOTAL_MODULES; i++) {
     push();
     translate(modules[i].posX, modules[i].posY);
+    rotate(frameCount * modules[i].rotationSpeed);
 
     modules[i].run();
     modules[i].display();
+
     //modules[i].drawEnclosingShape();
     //modules[i].drawIndex();
 
@@ -97,39 +105,6 @@ function createModules() {
     currentRingIndex++;
     x += RADIUS * 2;
   }
-
-  /*
-  let i = 0;
-  let currentRingIndex = 0;
-
-  while (i < modules.length) {
-    if (currentRingIndex == 0) {
-      modules[i].run();
-      modules[i++].display();
-    } else {
-      let vertexLength = currentRingIndex;
-      let currentVertex = 0;
-
-      while (++currentVertex <= VERTICES && i < modules.length) {
-        for (let step = 0; step < vertexLength; step++) {
-          if (i < modules.length) {
-            modules[i].run();
-            modules[i++].display();
-
-            translate(-RADIUS * 2 * cos(PI / 3), -RADIUS * 2 * sin(PI / 3));
-          } else {
-            break;
-          }
-        }
-
-        rotate(-PI / 3);
-      }
-    }
-
-    currentRingIndex++;
-    translate(RADIUS * 2, 0);
-  }
-  */
 
   for (let i = 0; i < TOTAL_MODULES; i++) {
     let m = new Module(i, 0, 0, RADIUS, VERTICES, PETAL_MAX_SIZE);
