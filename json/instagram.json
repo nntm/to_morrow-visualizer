@@ -1611,10 +1611,7 @@
                           "is_verified": false,
                           "follow_friction_type": -1
                         },
-                        "position": [
-                          0.316,
-                          0.6266666667
-                        ],
+                        "position": [0.316, 0.6266666667],
                         "start_time_in_video_in_sec": null,
                         "duration_in_video_in_sec": null
                       }
@@ -2618,10 +2615,7 @@
                           "is_verified": true,
                           "follow_friction_type": -1
                         },
-                        "position": [
-                          0.6352657005,
-                          0.6925635362
-                        ],
+                        "position": [0.6352657005, 0.6925635362],
                         "start_time_in_video_in_sec": null,
                         "duration_in_video_in_sec": null
                       },
@@ -2636,10 +2630,7 @@
                           "is_verified": false,
                           "follow_friction_type": -1
                         },
-                        "position": [
-                          0.3695652174,
-                          0.7388928305
-                        ],
+                        "position": [0.3695652174, 0.7388928305],
                         "start_time_in_video_in_sec": null,
                         "duration_in_video_in_sec": null
                       }
@@ -3248,10 +3239,7 @@
                           "is_verified": true,
                           "follow_friction_type": -1
                         },
-                        "position": [
-                          0.683555542,
-                          0.635555542
-                        ],
+                        "position": [0.683555542, 0.635555542],
                         "start_time_in_video_in_sec": null,
                         "duration_in_video_in_sec": null
                       },
@@ -3266,10 +3254,7 @@
                           "is_verified": true,
                           "follow_friction_type": -1
                         },
-                        "position": [
-                          0.207111084,
-                          0.4737777507
-                        ],
+                        "position": [0.207111084, 0.4737777507],
                         "start_time_in_video_in_sec": null,
                         "duration_in_video_in_sec": null
                       }
@@ -3339,10 +3324,7 @@
       "more_available": true,
       "next_max_id": "a12a9501ef1b45e3af24d2cacfd74e5d",
       "next_page": 1,
-      "next_media_ids": [
-        1994078250770781700,
-        2090410745490331400
-      ]
+      "next_media_ids": [1994078250770781700, 2090410745490331400]
     },
     "recent": {
       "sections": [
@@ -3826,10 +3808,7 @@
                           "is_verified": false,
                           "follow_friction_type": -1
                         },
-                        "position": [
-                          0.1437198068,
-                          0.9589371981
-                        ],
+                        "position": [0.1437198068, 0.9589371981],
                         "start_time_in_video_in_sec": null,
                         "duration_in_video_in_sec": null
                       }
@@ -4040,10 +4019,7 @@
                           "is_verified": false,
                           "follow_friction_type": -1
                         },
-                        "position": [
-                          0.1449275362,
-                          0.9541062802
-                        ],
+                        "position": [0.1449275362, 0.9541062802],
                         "start_time_in_video_in_sec": null,
                         "duration_in_video_in_sec": null
                       }
@@ -4780,10 +4756,7 @@
                           "is_verified": false,
                           "follow_friction_type": -1
                         },
-                        "position": [
-                          0.0966183575,
-                          0.940821256
-                        ],
+                        "position": [0.0966183575, 0.940821256],
                         "start_time_in_video_in_sec": null,
                         "duration_in_video_in_sec": null
                       }
@@ -5749,10 +5722,7 @@
                           "is_verified": false,
                           "follow_friction_type": -1
                         },
-                        "position": [
-                          0.0748792271,
-                          0.9355877617
-                        ],
+                        "position": [0.0748792271, 0.9355877617],
                         "start_time_in_video_in_sec": null,
                         "duration_in_video_in_sec": null
                       }

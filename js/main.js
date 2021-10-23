@@ -1,6 +1,5 @@
 let modules;
 
-let TOTAL_MODULES = 61;
 let ARTWORK_RINGS = countRings(TOTAL_MODULES);
 
 //--------------------------------------------------//
