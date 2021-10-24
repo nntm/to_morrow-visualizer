@@ -1,11 +1,39 @@
+let mainViewCanvas;
 let modules;
 
 let ARTWORK_RINGS = countRings(TOTAL_MODULES);
 
 //--------------------------------------------------//
 
+class ModuleCanvas {
+  constructor(width, height, parentID) {
+    this.width = width;
+    this.height = height;
+
+    this.parentID = parentID;
+
+    this.canvas = createCanvas(this.width, this.height);
+    this.canvas.parent(parentID);
+
+    this.maxZoomLvl = 1;
+    this.minZoomLvl = 0;
+    this.currentZoomLvl = 0;
+  }
+
+  resize(width, height) {
+    resizeCanvas(windowWidth, windowHeight);
+  }
+}
+
+//--------------------------------------------------//
+
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  mainViewCanvas = new ModuleCanvas(
+    windowWidth,
+    windowHeight,
+    "main-view-wrapper"
+  );
+
   createModules();
   frameRate(30);
 
@@ -62,7 +90,7 @@ function countRings(n) {
 //--------------------------------------------------//
 
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
+  mainViewCanvas.resize(windowWidth, windowHeight);
 }
 
 //--------------------------------------------------//

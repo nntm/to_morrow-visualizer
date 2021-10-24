@@ -24,11 +24,11 @@ class Module {
     this.petals = [];
     colorMode(RGB, 255, 255, 255);
     this.petalColors = [
-      color(46, 54, 20),
-      color(221, 202, 204),
-      color(163, 201, 235),
-      color(133, 99, 69),
-      color(169, 157, 180),
+      color(random(255), random(255), random(255)),
+      color(random(255), random(255), random(255)),
+      color(random(255), random(255), random(255)),
+      color(random(255), random(255), random(255)),
+      color(random(255), random(255), random(255)),
     ];
     this.petalShapeType =
       PETAL_SHAPE_TYPE[int(random(PETAL_SHAPE_TYPE.length))];
