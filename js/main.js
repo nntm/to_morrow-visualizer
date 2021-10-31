@@ -1,7 +1,37 @@
 let mainViewCanvas;
 let modules;
 
-let ARTWORK_RINGS = countRings(TOTAL_MODULES);
+//let ARTWORK_RINGS = countRings(TOTAL_MODULES);
+
+//--------------------------------------------------//
+
+let JSON_URL =
+  "http://ec2-52-221-184-232.ap-southeast-1.compute.amazonaws.com:8080//vfcd21/v1/processed-data";
+
+function getDataFromAPI() {
+  modules = [];
+
+  let json = loadJSON(JSON_URL, function (json) {
+    for (let i = 0; i < json.entries.length; i++) {
+      if (json.entries[i].is_new) {
+        addModule(modules.length, json.entries[i].visualization);
+      }
+    }
+  });
+
+  console.log(modules);
+}
+
+//--------------------------------------------------//
+
+function addModule(index, visualization) {
+  let m = new Module(
+    index,
+    createVector(random(width), random(height)),
+    visualization
+  );
+  modules.push(m);
+}
 
 //--------------------------------------------------//
 
@@ -25,8 +55,6 @@ class ModuleCanvas {
   }
 }
 
-//--------------------------------------------------//
-
 function setup() {
   mainViewCanvas = new ModuleCanvas(
     windowWidth,
@@ -34,16 +62,29 @@ function setup() {
     "main-view-wrapper"
   );
 
-  createModules();
   frameRate(30);
 
   rectMode(CENTER);
   ellipseMode(CENTER);
 
   strokeCap(SQUARE);
+
+  modules = [];
+
+  getDataFromAPI();
+
+  setInterval(function () {
+    getDataFromAPI();
+  }, REFRESH_INTERVAL);
+}
+
+function windowResized() {
+  mainViewCanvas.resize(windowWidth, windowHeight);
 }
 
 //--------------------------------------------------//
+
+let lastUpdate;
 
 function draw() {
   background(0);
@@ -51,9 +92,9 @@ function draw() {
   push();
   translate(width / 2, height / 2);
 
-  for (let i = 0; i < TOTAL_MODULES; i++) {
+  for (let i = 0; i < modules.length; i++) {
     push();
-    translate(modules[i].posX, modules[i].posY);
+    translate(modules[i].x, modules[i].y);
     rotate(frameCount * modules[i].rotationSpeed);
 
     modules[i].run();
@@ -89,61 +130,43 @@ function countRings(n) {
 
 //--------------------------------------------------//
 
-function windowResized() {
-  mainViewCanvas.resize(windowWidth, windowHeight);
-}
-
-//--------------------------------------------------//
-
-function createModules() {
-  modules = new Array();
-
+function calcPositions(index) {
   let x = 0;
   let y = 0;
 
   let i = 0;
   let currentRingIndex = 0;
 
-  while (i < TOTAL_MODULES) {
-    if (currentRingIndex == 0) {
-      let m = new Module(i++, x, y, RADIUS, VERTICES, PETAL_MAX_SIZE);
-      modules.push(m);
-    } else {
-      let vertexLength = currentRingIndex;
-      let currentVertex = 0;
+  while (i < index) {
+    let vertexLength = currentRingIndex;
+    let currentVertex = 0;
 
-      while (currentVertex < VERTICES && i < TOTAL_MODULES) {
-        for (let step = 0; step < vertexLength; step++) {
-          if (i < TOTAL_MODULES) {
-            let m = new Module(i++, x, y, RADIUS, VERTICES, PETAL_MAX_SIZE);
-            modules.push(m);
-
-            x -= RADIUS * 2 * cos((PI / 3) * (1 - currentVertex));
-            y -= RADIUS * 2 * sin((PI / 3) * (1 - currentVertex));
-          } else {
-            break;
-          }
+    while (currentVertex < VERTICES && i < index) {
+      for (let step = 0; step < vertexLength; step++) {
+        if (i < index) {
+          x -= RADIUS * 2 * cos((PI / 3) * (1 - currentVertex));
+          y -= RADIUS * 2 * sin((PI / 3) * (1 - currentVertex));
+        } else {
+          break;
         }
-
-        currentVertex++;
       }
+
+      currentVertex++;
     }
 
     currentRingIndex++;
     x += RADIUS * 2;
   }
 
-  for (let i = 0; i < TOTAL_MODULES; i++) {
-    let m = new Module(i, 0, 0, RADIUS, VERTICES, PETAL_MAX_SIZE);
-    modules.push(m);
-  }
+  pos = createVector(x, y);
+  console.log(pos);
+  return pos;
 }
 
 //--------------------------------------------------//
 
 function mouseClicked() {
   //save("export.png");
-
-  background(0);
-  createModules();
+  //background(0);
+  //createModules();
 }

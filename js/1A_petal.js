@@ -1,54 +1,50 @@
 class Petal {
   constructor(
+    lifespan,
+    lifespanRange,
     shapeType,
-    color,
     opacity,
-    kRadius,
     maxSize,
-    maxLifespan,
-    noiseSeed,
-    noiseSegment,
-    rotationSpeed
+    color,
+    rotation,
+    noiseSegmentLength
   ) {
+    this.lifespan = random(
+      lifespan * (1 - lifespanRange),
+      lifespan * (1 + lifespanRange)
+    );
+
     this.shapeType = shapeType;
-    this.triangleOutward = round(random(1)) == 0 ? true : false;
+    this.shapeIsOutward = round(random(1)) == 0 ? true : false;
 
     this.x = 0;
 
     this.color = color;
     this.opacity = opacity;
+    console.log(opacity);
 
-    this.kRadius = kRadius;
-
-    this.size = 0;
     this.maxSize = maxSize;
 
-    this.isOutward = true;
-    this.lifespan =
-      maxLifespan *
-      random(1 - PETAL_LIFESPAN_RANGE / 2, 1 + PETAL_LIFESPAN_RANGE / 2);
-    this.progress = this.isOutward ? 0 : this.lifespan;
+    this.isMovingOutward = round(random(1)) == 0 ? true : false;
+    this.progress = this.isMovingOutward ? 0 : this.lifespan;
+
     this.isDead = false;
 
-    this.noiseSeedMemory = noiseSeed;
-    this.noiseSegment = noiseSegment;
+    this.noiseSegmentLength = noiseSegmentLength;
 
-    this.randomSineShift = random(PI);
-
-    this.rotationSpeed = rotationSpeed;
+    this.rotation = rotation;
   }
 
-  update(petalNoisePos) {
-    noiseSeed(this.noiseSeedMemory);
-
-    this.x = map(this.progress, this.lifespan, 0, 0, 1) * this.kRadius;
+  update(noisePos) {
+    this.x = map(this.progress, this.lifespan, 0, 0, 1) * MODULE_RADIUS;
 
     this.width =
+      MODULE_RADIUS *
       sin(map(this.progress, this.lifespan, 0, 0, PI)) *
       map(
         noise(
-          map(this.progress, this.lifespan, 0, 0, this.noiseSegment),
-          petalNoisePos
+          map(this.progress, this.lifespan, 0, 0, this.noiseSegmentLength),
+          noisePos
         ),
         0,
         1,
@@ -57,11 +53,12 @@ class Petal {
       );
 
     this.height =
+      MODULE_RADIUS *
       sin(map(this.progress, this.lifespan, 0, PI, 0)) *
       map(
         noise(
-          petalNoisePos,
-          -map(this.progress, this.lifespan, 0, 0, this.noiseSegment)
+          noisePos,
+          -map(this.progress, this.lifespan, 0, 0, this.noiseSegmentLength)
         ),
         0,
         1,
@@ -69,7 +66,7 @@ class Petal {
         this.maxSize
       );
 
-    if (this.isOutward) {
+    if (this.isMovingOutward) {
       if (++this.progress > this.lifespan) {
         this.isDead = true;
       }
@@ -83,23 +80,41 @@ class Petal {
   display() {
     colorMode(RGB, 255, 255, 255, 1);
     noStroke();
-    fill(red(this.color), green(this.color), blue(this.color), this.opacity);
+    //fill(red(this.color), green(this.color), blue(this.color), this.opacity);
+    fill(255, 255, 255, 0.2);
 
     push();
-    translate(this.x - this.kRadius / 2, 0);
-    rotate(-frameCount * this.rotationSpeed);
+    translate(this.x - MODULE_RADIUS / 2.0, 0);
+    rotate(-frameCount * this.rotation);
 
     switch (this.shapeType) {
-      case "RECT":
-        rectMode(CENTER);
-        rect(0, 0, this.width, this.height);
+      case "SEMICIRCLE":
+        if (this.shapeIsOutward) {
+          arc(
+            this.width / 2,
+            0,
+            this.width * 2,
+            this.height,
+            HALF_PI,
+            -HALF_PI
+          );
+        } else {
+          arc(
+            -this.width / 2,
+            0,
+            this.width * 2,
+            this.height,
+            -HALF_PI,
+            HALF_PI
+          );
+        }
         break;
       case "ELLIPSE":
         ellipseMode(CENTER);
         ellipse(0, 0, this.width, this.height);
         break;
       case "TRIANGLE":
-        if (this.triangleOutward) {
+        if (this.shapeIsOutward) {
           triangle(
             -this.width / 2,
             0,

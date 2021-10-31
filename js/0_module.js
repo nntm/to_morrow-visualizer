@@ -1,198 +1,142 @@
 class Module {
-  constructor(index, x, y, radius, vertices, maxPetalSize) {
+  constructor(index, pos, vis) {
     this.index = index;
 
-    this.posX = x;
-    this.posY = y;
+    this.x = pos.x;
+    this.y = pos.y;
 
-    this.radius = radius;
-    this.vertices = vertices;
-    this.maxPetalSize = maxPetalSize;
+    // Module
+    this.vertexCount = vis.module.vertex_count;
+    this.rotationSpeed = vis.module.rotation_speed;
+    this.colors = this.toArray(vis.module.colors);
+    this.texture_segmentDivision = vis.module.texture.segment_division;
+    this.texture_strokeWeight = vis.module.texture.stroke_weight;
+    this.seed = int(random(MAX_NOISE_SEED));
 
-    this.levelOfDetails = random(1);
-    this.bpm = random(1);
-
-    this.rotationSpeed = map(
-      this.bpm,
-      0,
-      1,
-      ROTATION_SPEED[0],
-      ROTATION_SPEED[1]
-    );
-
-    // petal
+    // Petals
     this.petals = [];
-    colorMode(RGB, 255, 255, 255);
-    this.petalColors = [
-      color(random(255), random(255), random(255)),
-      color(random(255), random(255), random(255)),
-      color(random(255), random(255), random(255)),
-      color(random(255), random(255), random(255)),
-      color(random(255), random(255), random(255)),
-    ];
-    this.petalShapeType =
-      PETAL_SHAPE_TYPE[int(random(PETAL_SHAPE_TYPE.length))];
-    this.petalOpacity = map(
-      this.levelOfDetails,
-      0,
-      1,
-      PETAL_OPACITY[0],
-      PETAL_OPACITY[1]
-    );
-    this.petalPhase = map(
-      this.levelOfDetails,
-      0,
-      1,
-      PETAL_PHASE[0],
-      PETAL_PHASE[1]
-    );
-    this.petalPhaseCount = this.petalPhase;
-    this.petalColorPhase = map(
-      this.levelOfDetails,
-      0,
-      1,
-      PETAL_COLOR_PHASE[0],
-      PETAL_COLOR_PHASE[1]
-    );
-    this.petalColorPhaseCount = this.petalColorPhase;
-    this.petalCurrentColorIndex = int(random(this.petalColors.length));
-    this.petalLifespan = map(
-      this.bpm,
-      0,
-      1,
-      PETAL_LIFESPAN[0],
-      PETAL_LIFESPAN[1]
-    );
-    this.petalNoiseSegment = map(
-      this.bpm,
-      0,
-      1,
-      PETAL_NOISE_SEGMENT[0],
-      PETAL_NOISE_SEGMENT[1]
-    );
-    this.petalNoiseMapIncrement = map(
-      this.bpm,
-      0,
-      1,
-      PETAL_NOISE_MAP_INCREMENT[0],
-      PETAL_NOISE_MAP_INCREMENT[1]
-    );
-    this.petalNoisePos = 0;
+    this.petal_lifespan = vis.petals.lifespan;
+    this.petal_lifespanRange = vis.petals.lifespan_range;
+    this.petal_shapeType = vis.petals.shape_type;
+    this.petal_opacity = vis.petals.opacity;
+    console.log(vis.petals);
+    this.petal_phase = vis.petals.phase;
+    this.petal_phaseCount = this.petal_phase;
+    this.petal_maxSize = vis.petals.max_size;
+    this.petal_colors = this.toArray(vis.petals.colors);
+    this.petal_currentColorIndex = int(random(this.petal_colors.length));
+    this.petal_colorPhase = vis.petals.color_phase;
+    this.petal_colorPhaseProgress = int(random(this.petal_colorPhase));
+    this.petal_rotation = vis.petals.rotation;
+    this.petal_direction = vis.petals.direction;
+    this.petal_noiseSegmentLength = vis.petals.noise_segment_length;
+    this.petal_noisePos = 0;
+    this.petal_noiseSegmentShift = vis.petals.noise_segment_shift;
 
-    this.petalDirection = TWO_PI * random(1);
-
-    // texture
-    this.slices =
-      this.vertices *
-      round(
-        map(
-          this.levelOfDetails,
-          0,
-          1,
-          SLICE_DIVISION_MULTIPLIER[0],
-          SLICE_DIVISION_MULTIPLIER[1]
-        )
-      );
-    this.strokeWeight = map(
-      random(1),
-      0,
-      1,
-      STROKE_WEIGHT[0],
-      STROKE_WEIGHT[1]
-    );
-
-    // ray
+    // Rays
     this.rays = [];
-    this.rayPhase = map(this.levelOfDetails, 0, 1, RAY_PHASE[0], RAY_PHASE[1]);
-    this.rayPhaseCount = this.rayPhase;
-    this.rayLifespan = map(this.bpm, 0, 1, RAY_LIFESPAN[0], RAY_LIFESPAN[1]);
-    this.rayLifespanRange = map(
-      this.levelOfDetails,
-      0,
-      1,
-      RAY_LIFESPAN_RANGE[0],
-      RAY_LIFESPAN_RANGE[1]
-    );
-    this.rayMaxLengthRatio = map(
-      this.levelOfDetails,
-      0,
-      1,
-      RAY_MAX_LENGTH_RATIO[0],
-      RAY_MAX_LENGTH_RATIO[1]
-    );
-    this.rayDensity = map(this.levelOfDetails, 0, 1, 1, 6);
+    this.ray_lifespan = vis.rays.lifespan;
+    this.ray_lifespanRange = vis.rays.lifespan_range;
+    this.ray_phase = vis.rays.phase;
+    this.ray_phaseCount = this.ray_phase;
+    this.ray_length = vis.rays.length;
+    this.ray_multiplier = vis.rays.multiplier;
+    this.ray_colors = this.toArray(vis.rays.colors);
 
-    // arc
+    // Arcs
     this.arcs = [];
-    this.arcOpacity = this.petalOpacity;
-    this.arcPhase = map(this.levelOfDetails, 1, 0, ARC_PHASE[0], ARC_PHASE[1]);
-    this.arcPhaseCount = this.arcPhase;
+    this.arc_lifespan = vis.arcs.lifespan;
+    this.arc_lifespanRange = vis.arcs.lifespan_range;
+    this.arc_opacity = vis.arcs.opacity;
+    this.arc_phase = vis.arcs.phase;
+    this.arc_phaseCount = this.arc_phase;
+    this.arc_colors = this.toArray(vis.arcs.colors);
+    this.arc_span = vis.arcs.span;
+    this.arc_isClockwise = vis.arcs.is_clockwise;
+    this.arc_noiseSegmentLength = vis.arcs.noise_segment_length;
 
-    this.arcSpan = random(1);
-    this.arcIsClockwise = this.arcSpan <= 0.5 ? false : true;
-
-    this.arcLifespan = map(this.bpm, 1, 0, ARC_LIFESPAN[0], ARC_LIFESPAN[1]);
-    this.arcLifespanRange = map(
-      this.levelOfDetails,
-      1,
-      0,
-      ARC_LIFESPAN_RANGE[0],
-      ARC_LIFESPAN_RANGE[1]
-    );
+    // Droplets
+    //this.droplets = [];
+    //this.droplet_lifespan = setDropletLifespan();
+    //this.droplet_lifespanRange = setDrople();
+    //this.droplet_multiplier = setRayLifespan();
+    //this.droplet_colors = setRayLifespan();
   }
 
   //--------------------------------------------------//
 
-  run() {
-    this.noiseSeedMemory = int(random(MAX_NOISE_SEED));
-    this.petalNoisePos += this.petalNoiseMapIncrement;
+  toArray(jsonArr) {
+    let arr = [];
 
-    if (this.petalPhaseCount++ >= this.petalPhase) {
-      let color1 = this.petalColors[this.petalCurrentColorIndex];
+    for (let i = 0; i < jsonArr.length; i++) {
+      arr.push(color(jsonArr[i].r, jsonArr[i].g, jsonArr[i].b));
+    }
+
+    return arr;
+  }
+
+  //--------------------------------------------------//
+  //--------------------------------------------------//
+  //--------------------------------------------------//
+
+  run() {
+    noiseSeed(this.seed);
+
+    //--------------------------------------------------//
+    // Petals
+    this.petal_noisePos += this.petal_noiseSegmentShift;
+
+    if (this.petal_phaseCount++ >= this.petal_phase) {
+      let color1 = this.petal_colors[this.petal_currentColorIndex];
       let color2;
-      if (this.petalCurrentColorIndex < this.petalColors.length - 1) {
-        color2 = this.petalColors[this.petalCurrentColorIndex + 1];
+
+      if (this.petal_currentColorIndex < this.petal_colors.length - 1) {
+        color2 = this.petal_colors[this.petal_currentColorIndex + 1];
       } else {
-        color2 = this.petalColors[0];
+        color2 = this.petal_colors[0];
       }
 
       this.addPetal(
         lerpColor(
           color1,
           color2,
-          map(this.petalColorPhaseCount, 0, this.petalColorPhase, 0, 1)
+          map(this.petal_colorPhaseCount, 0, this.petal_colorPhase, 0, 1)
         )
       );
 
-      this.petalPhaseCount = 0;
+      this.petal_phaseCount = 0;
     }
 
-    if (this.petalColorPhaseCount++ >= this.petalColorPhase) {
-      this.petalColorPhaseCount = 0;
+    if (this.petal_colorPhaseCount++ >= this.petal_colorPhase) {
+      this.petal_colorPhaseCount = 0;
 
-      if (this.petalCurrentColorIndex++ >= this.petalColors.length - 1) {
-        this.petalCurrentColorIndex = 0;
+      if (this.petal_currentColorIndex++ >= this.petal_colors.length - 1) {
+        this.petal_currentColorIndex = 0;
       }
     }
 
     for (let i = this.petals.length - 1; i >= 0; i--) {
-      let petal = this.petals[i];
-      petal.update(this.petalNoisePos);
+      let p = this.petals[i];
+      p.update(this.petal_noisePos);
 
-      if (petal.isDead) {
+      if (p.isDead) {
         this.petals.splice(i, 1);
       }
     }
 
-    if (this.rayPhaseCount++ >= this.rayPhase) {
-      for (let i = 0; i < this.rayDensity; i++) {
+    //--------------------------------------------------//
+    // Rays
+    /*
+    if (this.ray_phaseCount++ >= this.ray_phase) {
+      for (let i = 0; i < this.ray_multiplier; i++) {
         this.addRay(
-          this.petalColors[int(random(this.petalColors.length))],
-          (TWO_PI / this.slices) * ceil(random(this.slices))
+          this.ray_colors[int(random(this.ray_colors.length))],
+          (TWO_PI / this.texture_segmentDivision) *
+            ceil(random(this.texture_segmentDivision))
         );
       }
 
-      this.rayPhaseCount = 0;
+      this.ray_phaseCount = 0;
     }
 
     for (let i = this.rays.length - 1; i >= 0; i--) {
@@ -203,10 +147,14 @@ class Module {
         this.rays.splice(i, 1);
       }
     }
+    */
 
-    if (this.arcPhaseCount++ >= this.arcPhase) {
-      this.addArc(this.petalColors[int(random(this.petalColors.length))]);
-      this.arcPhaseCount = 0;
+    //--------------------------------------------------//
+    // Arcs
+    /*
+    if (this.arc_phaseCount++ >= this.arc_phase) {
+      this.addArc(this.arc_colors[int(random(this.arc_colors.length))]);
+      this.arc_phaseCount = 0;
     }
 
     for (let i = this.arcs.length - 1; i >= 0; i--) {
@@ -217,22 +165,23 @@ class Module {
         this.arcs.splice(i, 1);
       }
     }
+    */
   }
 
   //--------------------------------------------------//
+  //--------------------------------------------------//
+  //--------------------------------------------------//
 
   display() {
-    blendMode(SCREEN);
-
-    for (let petal of this.petals) {
-      for (let i = 0; i < this.vertices; i++) {
-        rotate(TWO_PI / this.vertices);
+    for (let p of this.petals) {
+      for (let i = 0; i < MODULE_VERTEX_COUNT; i++) {
+        rotate(TWO_PI / MODULE_VERTEX_COUNT);
 
         push();
-        translate(this.radius / 2, 0);
-        rotate(this.petalDirection);
+        translate(RADIUS / 2, 0);
+        rotate(this.petal_direction);
 
-        petal.display();
+        p.display();
 
         pop();
       }
@@ -251,7 +200,7 @@ class Module {
 
   drawIndex() {
     noStroke();
-    fill(this.petalColors[0]);
+    fill(this.colors[colors.length - 1]);
 
     textSize(30);
     textAlign(CENTER, CENTER);
@@ -261,10 +210,14 @@ class Module {
 
   drawEnclosingShape() {
     noFill();
-    stroke(this.petalColors[0]);
+    fill(this.colors[colors.length - 1]);
 
     beginShape();
-    for (let a = HALF_PI; a < TWO_PI + HALF_PI; a += TWO_PI / this.vertices) {
+    for (
+      let a = HALF_PI;
+      a < TWO_PI + HALF_PI;
+      a += TWO_PI / MODULE_VERTEX_COUNT
+    ) {
       let sx = cos(a) * this.radius;
       let sy = sin(a) * this.radius;
       vertex(sx, sy);
@@ -275,19 +228,18 @@ class Module {
   //--------------------------------------------------//
 
   addPetal(color) {
-    let petal = new Petal(
-      this.petalShapeType,
+    let p = new Petal(
+      this.petal_lifespan,
+      this.petal_lifespanRange,
+      this.petal_shapeType,
+      this.petal_opacity,
+      this.petal_maxSize,
       color,
-      this.petalOpacity,
-      this.radius,
-      this.maxPetalSize,
-      this.petalLifespan,
-      noiseSeed,
-      this.petalNoiseSegment,
-      this.rotationSpeed * random(2)
+      this.petal_rotation,
+      this.petal_noiseSegmentLength
     );
 
-    this.petals.push(petal);
+    this.petals.push(p);
   }
 
   addRay(color, angle) {
