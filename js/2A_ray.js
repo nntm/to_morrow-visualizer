@@ -43,9 +43,10 @@ class Ray {
     );
 
     if (!this.isLongest) {
-      this.isLongest = ++this.progress1 >= this.lifespan1;
+      this.progress1 += FPS_RELATIVE_SPEED;
+      this.isLongest = this.progress1 >= this.lifespan1;
     } else {
-      this.progress2++;
+      this.progress2 += FPS_RELATIVE_SPEED;
     }
 
     if (this.isLongest && this.progress2 >= this.lifespan2) {

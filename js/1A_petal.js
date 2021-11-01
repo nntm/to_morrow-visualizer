@@ -70,10 +70,14 @@ class Petal {
       );
 
     if (this.isMovingOutward) {
-      if (++this.progress > this.lifespan) {
+      this.progress += FPS_RELATIVE_SPEED;
+
+      if (this.progress > this.lifespan) {
         this.isDead = true;
       }
     } else {
+      this.progress -= FPS_RELATIVE_SPEED;
+
       if (--this.progress < 0) {
         this.isDead = true;
       }

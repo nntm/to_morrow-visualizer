@@ -84,7 +84,7 @@ class Module {
     // Petals
     this.petal_noisePos += this.petal_noiseSegmentShift;
 
-    if (this.petal_phaseCount++ >= this.petal_phase) {
+    if (this.petal_phaseCount >= this.petal_phase) {
       let color1 = this.petal_colors[this.petal_currentColorIndex];
       let color2;
 
@@ -103,14 +103,18 @@ class Module {
       );
 
       this.petal_phaseCount = 0;
+    } else {
+      this.petal_phaseCount += FPS_RELATIVE_SPEED;
     }
 
-    if (this.petal_colorPhaseCount++ >= this.petal_colorPhase) {
+    if (this.petal_colorPhaseCount >= this.petal_colorPhase) {
       this.petal_colorPhaseCount = 0;
 
       if (this.petal_currentColorIndex++ >= this.petal_colors.length - 1) {
         this.petal_currentColorIndex = 0;
       }
+    } else {
+      this.petal_colorPhaseCount += FPS_RELATIVE_SPEED;
     }
 
     for (let i = this.petals.length - 1; i >= 0; i--) {
@@ -124,7 +128,7 @@ class Module {
 
     //--------------------------------------------------//
     // Rays
-    if (this.ray_phaseCount++ >= this.ray_phase) {
+    if (this.ray_phaseCount >= this.ray_phase) {
       for (let i = 0; i < this.ray_multiplier; i++) {
         this.addRay(
           this.ray_colors[int(random(this.ray_colors.length))],
@@ -134,6 +138,8 @@ class Module {
       }
 
       this.ray_phaseCount = 0;
+    } else {
+      this.ray_phaseCount += FPS_RELATIVE_SPEED;
     }
 
     for (let i = this.rays.length - 1; i >= 0; i--) {
@@ -148,7 +154,7 @@ class Module {
     //--------------------------------------------------//
     // Arcs
     if (this.arc_phase >= 0) {
-      if (this.arc_phaseCount++ >= this.arc_phase) {
+      if (this.arc_phaseCount >= this.arc_phase) {
         this.addArc(
           this.arc_colors[int(random(this.arc_colors.length))],
           (TWO_PI / this.texture_segmentDivision) *
@@ -156,6 +162,8 @@ class Module {
         );
 
         this.arc_phaseCount = 0;
+      } else {
+        this.arc_phaseCount += FPS_RELATIVE_SPEED;
       }
 
       for (let i = this.arcs.length - 1; i >= 0; i--) {

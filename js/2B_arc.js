@@ -54,9 +54,10 @@ class Arc {
       this.a2 = map(this.progress2, 0, this.lifespan2, this.begin, this.end);
 
       if (!this.isLongest) {
-        this.isLongest = ++this.progress1 >= this.lifespan1;
+        this.progress1 += FPS_RELATIVE_SPEED;
+        this.isLongest = this.progress1 >= this.lifespan1;
       } else {
-        this.progress2++;
+        this.progress2 += FPS_RELATIVE_SPEED;
       }
 
       if (this.isLongest && this.progress2 >= this.lifespan2) {
@@ -67,7 +68,8 @@ class Arc {
       this.a2 = map(this.progress2, 0, this.lifespan2, this.end, this.begin);
 
       if (!this.isLongest) {
-        this.isLongest = --this.progress1 <= 0;
+        this.progress1 -= FPS_RELATIVE_SPEED;
+        this.isLongest = this.progress1 <= 0;
       } else {
         this.progress2--;
       }

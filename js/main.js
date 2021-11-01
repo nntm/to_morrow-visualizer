@@ -10,6 +10,9 @@ let TOTAL_MODULE_COUNT = 0;
 let MODULE_RADIUS;
 let MODULE_VERTEX_COUNT = 6;
 
+let FPS_DEFAULT = 30;
+let FPS_RELATIVE_SPEED;
+
 let REFRESH_INTERVAL = 5000;
 
 //--------------------------------------------------//
@@ -136,7 +139,8 @@ function setup() {
     "main-view-wrapper"
   );
 
-  frameRate(60);
+  frameRate(FPS_DEFAULT);
+  FPS_RELATIVE_SPEED = 1;
 
   rectMode(CENTER);
   ellipseMode(CENTER);
@@ -178,6 +182,9 @@ function windowResized() {
 
 function draw() {
   background(0);
+
+  FPS_SPEED = (FPS_DEFAULT * 1.0) / frameRate();
+  console.log(FPS_SPEED);
 
   push();
   translate(width / 2, height / 2);
