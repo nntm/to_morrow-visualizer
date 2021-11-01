@@ -184,7 +184,6 @@ function draw() {
   background(0);
 
   FPS_SPEED = (FPS_DEFAULT * 1.0) / frameRate();
-  console.log(FPS_SPEED);
 
   push();
   translate(width / 2, height / 2);
