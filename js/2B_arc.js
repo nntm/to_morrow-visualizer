@@ -1,58 +1,52 @@
 class Arc {
   constructor(
-    color,
-    opacity,
-    slices,
-    arcSpan,
-    kRadius,
-    isClockwise,
-    maxLifespan,
+    lifespan,
     lifespanRange,
+    opacity,
+    color,
+    segment,
+    span,
+    isClockwise,
     strokeWeight
   ) {
-    this.color = color;
-    this.opacity = opacity;
-
-    this.radius = random(kRadius);
-
     this.isClockwise = isClockwise;
 
-    this.slices = slices;
-    this.arcAngleSpan = map(arcSpan, 0, 1, 0, TWO_PI);
-    this.begin = map(random(1), 0, 1, 0, TWO_PI);
-
-    if (this.isClockwise) {
-      this.end = this.begin + this.arcAngleSpan;
-    } else {
-      this.end = this.begin - this.arcAngleSpan;
-    }
-
     this.lifespan1 = round(
-      maxLifespan *
-        constrain(random(1 - lifespanRange / 2, 1 + lifespanRange / 2), 0, 1)
+      random(lifespan - lifespanRange, lifespan + lifespanRange)
     );
     this.progress1 = this.isClockwise ? 0 : this.lifespan1;
 
     this.lifespan2 = round(
-      maxLifespan *
-        constrain(random(1 - lifespanRange / 2, 1 + lifespanRange / 2), 0, 1)
+      random(lifespan - lifespanRange, lifespan + lifespanRange)
     );
     this.progress2 = this.isClockwise ? 0 : this.lifespan2;
+
+    this.span = map(span, 0, 1, 0, TWO_PI);
+
+    this.begin = segment;
+    if (this.isClockwise) {
+      this.end = this.begin + this.span;
+    } else {
+      this.end = this.begin - this.span;
+    }
+
+    this.opacity = opacity;
+    this.color = color;
 
     this.isLongest = false;
     this.isDead = false;
 
-    this.strokeWeight = strokeWeight;
+    this.strokeWeight = strokeWeight * MODULE_RADIUS;
 
-    this.maxRadius = kRadius;
+    this.radius = 0;
 
     this.a1 = 0;
     this.a2 = 0;
 
-    this.seed = int(random(MAX_NOISE_SEED));
-    this.noiseX = 0;
-    this.noiseInc = 0.005;
+    this.isMovingOutward = round(random(1)) == 0 ? true : false;
   }
+
+  //--------------------------------------------------//
 
   update() {
     if (this.isClockwise) {
@@ -83,23 +77,30 @@ class Arc {
       }
     }
 
-    noiseSeed(this.seed);
-
-    this.radius = map(
-      noise(this.noiseX),
-      0,
-      1,
-      this.strokeWeight,
-      this.maxRadius
-    );
-
-    this.noiseX += this.noiseInc;
+    if (this.isMovingOutward) {
+      this.radius = map(
+        this.progress1 + this.progress2,
+        0,
+        this.lifespan1 + this.lifespan2,
+        0,
+        MODULE_RADIUS
+      );
+    } else {
+      this.radius = map(
+        this.progress1 + this.progress2,
+        0,
+        this.lifespan1 + this.lifespan2,
+        MODULE_RADIUS,
+        0
+      );
+    }
   }
 
+  //--------------------------------------------------//
+
   display() {
-    blendMode(SCREEN);
     noFill();
-    stroke(255, 255, 255, this.opacity);
+    stroke(red(this.color), green(this.color), blue(this.color), this.opacity);
     strokeWeight(this.strokeWeight);
 
     if (this.isClockwise) {

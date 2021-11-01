@@ -9,9 +9,8 @@ class Petal {
     rotation,
     noiseSegmentLength
   ) {
-    this.lifespan = random(
-      lifespan * (1 - lifespanRange),
-      lifespan * (1 + lifespanRange)
+    this.lifespan = round(
+      random(lifespan * (1 - lifespanRange), lifespan * (1 + lifespanRange))
     );
 
     this.shapeType = shapeType;
@@ -21,7 +20,6 @@ class Petal {
 
     this.color = color;
     this.opacity = opacity;
-    console.log(opacity);
 
     this.maxSize = maxSize;
 
@@ -31,11 +29,16 @@ class Petal {
     this.isDead = false;
 
     this.noiseSegmentLength = noiseSegmentLength;
+    this.seed = int(random(MAX_NOISE_SEED));
 
     this.rotation = rotation;
   }
 
+  //--------------------------------------------------//
+
   update(noisePos) {
+    noiseSeed(this.seed);
+
     this.x = map(this.progress, this.lifespan, 0, 0, 1) * MODULE_RADIUS;
 
     this.width =
@@ -77,18 +80,19 @@ class Petal {
     }
   }
 
+  //--------------------------------------------------//
+
   display() {
     colorMode(RGB, 255, 255, 255, 1);
     noStroke();
-    //fill(red(this.color), green(this.color), blue(this.color), this.opacity);
-    fill(255, 255, 255, 0.2);
+    fill(red(this.color), green(this.color), blue(this.color), this.opacity);
 
     push();
     translate(this.x - MODULE_RADIUS / 2.0, 0);
     rotate(-frameCount * this.rotation);
 
     switch (this.shapeType) {
-      case "SEMICIRCLE":
+      case "SEMIELLIPSE":
         if (this.shapeIsOutward) {
           arc(
             this.width / 2,

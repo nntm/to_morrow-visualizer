@@ -1,17 +1,18 @@
 class Module {
-  constructor(index, pos, vis) {
+  constructor(index, id, isNew, pos, ins, wea, vis) {
     this.index = index;
+    this.id = id;
+    this.isNew = isNew;
 
-    this.x = pos.x;
-    this.y = pos.y;
+    this.pos = pos;
 
     // Module
     this.vertexCount = vis.module.vertex_count;
     this.rotationSpeed = vis.module.rotation_speed;
     this.colors = this.toArray(vis.module.colors);
-    this.texture_segmentDivision = vis.module.texture.segment_division;
+    this.texture_segmentDivision =
+      vis.module.texture.segment_division * this.vertexCount;
     this.texture_strokeWeight = vis.module.texture.stroke_weight;
-    this.seed = int(random(MAX_NOISE_SEED));
 
     // Petals
     this.petals = [];
@@ -19,14 +20,13 @@ class Module {
     this.petal_lifespanRange = vis.petals.lifespan_range;
     this.petal_shapeType = vis.petals.shape_type;
     this.petal_opacity = vis.petals.opacity;
-    console.log(vis.petals);
     this.petal_phase = vis.petals.phase;
     this.petal_phaseCount = this.petal_phase;
     this.petal_maxSize = vis.petals.max_size;
     this.petal_colors = this.toArray(vis.petals.colors);
     this.petal_currentColorIndex = int(random(this.petal_colors.length));
     this.petal_colorPhase = vis.petals.color_phase;
-    this.petal_colorPhaseProgress = int(random(this.petal_colorPhase));
+    this.petal_colorPhaseCount = int(random(this.petal_colorPhase));
     this.petal_rotation = vis.petals.rotation;
     this.petal_direction = vis.petals.direction;
     this.petal_noiseSegmentLength = vis.petals.noise_segment_length;
@@ -49,6 +49,7 @@ class Module {
     this.arc_lifespanRange = vis.arcs.lifespan_range;
     this.arc_opacity = vis.arcs.opacity;
     this.arc_phase = vis.arcs.phase;
+    this.arc_phase = 100;
     this.arc_phaseCount = this.arc_phase;
     this.arc_colors = this.toArray(vis.arcs.colors);
     this.arc_span = vis.arcs.span;
@@ -80,8 +81,6 @@ class Module {
   //--------------------------------------------------//
 
   run() {
-    noiseSeed(this.seed);
-
     //--------------------------------------------------//
     // Petals
     this.petal_noisePos += this.petal_noiseSegmentShift;
@@ -126,7 +125,6 @@ class Module {
 
     //--------------------------------------------------//
     // Rays
-    /*
     if (this.ray_phaseCount++ >= this.ray_phase) {
       for (let i = 0; i < this.ray_multiplier; i++) {
         this.addRay(
@@ -147,25 +145,29 @@ class Module {
         this.rays.splice(i, 1);
       }
     }
-    */
 
     //--------------------------------------------------//
     // Arcs
-    /*
-    if (this.arc_phaseCount++ >= this.arc_phase) {
-      this.addArc(this.arc_colors[int(random(this.arc_colors.length))]);
-      this.arc_phaseCount = 0;
-    }
+    if (this.arc_phase >= 0) {
+      if (this.arc_phaseCount++ >= this.arc_phase) {
+        this.addArc(
+          this.arc_colors[int(random(this.arc_colors.length))],
+          (TWO_PI / this.texture_segmentDivision) *
+            ceil(random(this.texture_segmentDivision))
+        );
 
-    for (let i = this.arcs.length - 1; i >= 0; i--) {
-      let a = this.arcs[i];
-      a.update();
+        this.arc_phaseCount = 0;
+      }
 
-      if (a.isDead) {
-        this.arcs.splice(i, 1);
+      for (let i = this.arcs.length - 1; i >= 0; i--) {
+        let a = this.arcs[i];
+        a.update();
+
+        if (a.isDead) {
+          this.arcs.splice(i, 1);
+        }
       }
     }
-    */
   }
 
   //--------------------------------------------------//
@@ -173,12 +175,14 @@ class Module {
   //--------------------------------------------------//
 
   display() {
+    blendMode(SCREEN);
+
     for (let p of this.petals) {
       for (let i = 0; i < MODULE_VERTEX_COUNT; i++) {
         rotate(TWO_PI / MODULE_VERTEX_COUNT);
 
         push();
-        translate(RADIUS / 2, 0);
+        translate(MODULE_RADIUS / 2, 0);
         rotate(this.petal_direction);
 
         p.display();
@@ -200,7 +204,7 @@ class Module {
 
   drawIndex() {
     noStroke();
-    fill(this.colors[colors.length - 1]);
+    fill(this.colors[this.colors.length - 1]);
 
     textSize(30);
     textAlign(CENTER, CENTER);
@@ -210,7 +214,8 @@ class Module {
 
   drawEnclosingShape() {
     noFill();
-    fill(this.colors[colors.length - 1]);
+    stroke(this.colors[this.colors.length - 1]);
+    strokeWeight(1);
 
     beginShape();
     for (
@@ -218,8 +223,8 @@ class Module {
       a < TWO_PI + HALF_PI;
       a += TWO_PI / MODULE_VERTEX_COUNT
     ) {
-      let sx = cos(a) * this.radius;
-      let sy = sin(a) * this.radius;
+      let sx = cos(a) * MODULE_RADIUS;
+      let sy = sin(a) * MODULE_RADIUS;
       vertex(sx, sy);
     }
     endShape(CLOSE);
@@ -242,31 +247,29 @@ class Module {
     this.petals.push(p);
   }
 
-  addRay(color, angle) {
+  addRay(color, segment) {
     let r = new Ray(
+      this.ray_lifespan,
+      this.ray_lifespanRange,
+      this.ray_length,
       color,
-      angle,
-      this.rayLifespan,
-      this.rayLifespanRange,
-      this.rayMaxLengthRatio,
-      this.radius,
-      this.strokeWeight
+      segment,
+      this.texture_strokeWeight
     );
 
     this.rays.push(r);
   }
 
-  addArc(color) {
+  addArc(color, segment) {
     let a = new Arc(
+      this.arc_lifespan,
+      this.arc_lifespanRange,
+      this.arc_opacity,
       color,
-      this.arcOpacity,
-      this.slices,
-      this.arcSpan,
-      this.radius,
-      this.arcIsClockwise,
-      this.arcLifespan,
-      this.arcLifespanRange,
-      this.strokeWeight
+      segment,
+      this.arc_span,
+      this.arc_isClockwise,
+      this.texture_strokeWeight
     );
 
     this.arcs.push(a);
