@@ -136,7 +136,7 @@ function setup() {
     "main-view-wrapper"
   );
 
-  frameRate(30);
+  frameRate(60);
 
   rectMode(CENTER);
   ellipseMode(CENTER);

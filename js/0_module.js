@@ -49,7 +49,6 @@ class Module {
     this.arc_lifespanRange = vis.arcs.lifespan_range;
     this.arc_opacity = vis.arcs.opacity;
     this.arc_phase = vis.arcs.phase;
-    this.arc_phase = 100;
     this.arc_phaseCount = this.arc_phase;
     this.arc_colors = this.toArray(vis.arcs.colors);
     this.arc_span = vis.arcs.span;
