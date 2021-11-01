@@ -1,20 +1,6 @@
 let mainViewCanvas;
 let modules;
 
-let ARTWORK_RING_COUNT;
-let CANVAS_MARGIN;
-
-let MAX_NOISE_SEED = 10000;
-
-let TOTAL_MODULE_COUNT = 0;
-let MODULE_RADIUS;
-let MODULE_VERTEX_COUNT = 6;
-
-let FPS_DEFAULT = 30;
-let FPS_RELATIVE_SPEED;
-
-let REFRESH_INTERVAL = 5000;
-
 //--------------------------------------------------//
 //--------------------------------------------------//
 //--------------------------------------------------//
