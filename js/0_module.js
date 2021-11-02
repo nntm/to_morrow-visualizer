@@ -37,7 +37,7 @@ class Module {
     this.rays = [];
     this.ray_lifespan = vis.rays.lifespan;
     this.ray_lifespanRange = vis.rays.lifespan_range;
-    this.ray_phase = vis.rays.phase;
+    this.ray_phase = vis.rays.phas;
     this.ray_phaseCount = this.ray_phase;
     this.ray_length = vis.rays.length;
     this.ray_multiplier = vis.rays.multiplier;
