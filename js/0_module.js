@@ -55,25 +55,14 @@ class Module {
     this.arc_isClockwise = vis.arcs.is_clockwise;
     this.arc_noiseSegmentLength = vis.arcs.noise_segment_length;
 
-    // Droplets1
-    this.precip = round(random(100)) <= 80 ? 0 : random(0, 40);
-
+    // Droplets
+    this.droplets = [];
     this.DROPLET_LIFESPAN = [45, 30];
 
-    this.droplet_lifespan =
-      this.precip <= 0
-        ? -1
-        : map(
-            this.precip,
-            0,
-            40,
-            this.DROPLET_LIFESPAN[0],
-            this.DROPLET_LIFESPAN[1]
-          );
-    this.droplet_lifespanRange = map(this.precip, 0, 40, 0.3, 0.15);
-    this.droplet_colors = this.arc_colors;
+    this.droplet_lifespan = vis.droplets.lifespan;
+    this.droplet_lifespanRange = vis.droplets.lifespan_range;
+    this.droplet_colors = vis.droplets.colors;
 
-    this.droplets = [];
     this.droplet_phase = map(
       this.droplet_lifespan,
       this.DROPLET_LIFESPAN[0],
