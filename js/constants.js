@@ -11,5 +11,3 @@ let FPS_DEFAULT = 30;
 let FPS_RELATIVE_SPEED;
 
 let REFRESH_INTERVAL = 5000;
-
-let RAIN = [0, 40];
