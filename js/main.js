@@ -19,19 +19,19 @@ function updateModules() {
     for (let i = 0; i < json.entries.length; i++) {
       addModule(
         update,
-        json.entries[i].index,
+        json.entries[i].data_index,
         json.entries[i].id,
         json.entries[i].is_new,
         coordinates[i],
-        json.entries[i].instagram,
-        json.entries[i].weather,
         json.entries[i].visualization
       );
 
+      /*
       console.log();
       console.log(json.entries[i].index);
       console.log(json.entries[i].instagram.link_to_original_post);
       console.log(json.entries[i].instagram.username);
+      */
     }
   });
 
@@ -188,7 +188,7 @@ function draw() {
     modules[i].display();
 
     //modules[i].drawEnclosingShape();
-    modules[i].drawIndex();
+    //modules[i].drawIndex();
 
     pop();
   }

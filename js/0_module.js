@@ -1,5 +1,5 @@
 class Module {
-  constructor(index, id, isNew, pos, ins, wea, vis) {
+  constructor(index, id, isNew, pos, vis) {
     this.index = index;
     this.id = id;
     this.isNew = isNew;
@@ -37,7 +37,7 @@ class Module {
     this.rays = [];
     this.ray_lifespan = vis.rays.lifespan;
     this.ray_lifespanRange = vis.rays.lifespan_range;
-    this.ray_phase = vis.rays.phas;
+    this.ray_phase = vis.rays.phase;
     this.ray_phaseCount = this.ray_phase;
     this.ray_length = vis.rays.length;
     this.ray_multiplier = vis.rays.multiplier;
@@ -55,12 +55,41 @@ class Module {
     this.arc_isClockwise = vis.arcs.is_clockwise;
     this.arc_noiseSegmentLength = vis.arcs.noise_segment_length;
 
-    // Droplets
-    //this.droplets = [];
-    //this.droplet_lifespan = setDropletLifespan();
-    //this.droplet_lifespanRange = setDrople();
-    //this.droplet_multiplier = setRayLifespan();
-    //this.droplet_colors = setRayLifespan();
+    // Droplets1
+    this.precip = round(random(100)) <= 80 ? 0 : random(0, 40);
+
+    this.DROPLET_LIFESPAN = [45, 30];
+
+    this.droplet_lifespan =
+      this.precip <= 0
+        ? -1
+        : map(
+            this.precip,
+            0,
+            40,
+            this.DROPLET_LIFESPAN[0],
+            this.DROPLET_LIFESPAN[1]
+          );
+    this.droplet_lifespanRange = map(this.precip, 0, 40, 0.3, 0.15);
+    this.droplet_colors = this.arc_colors;
+
+    this.droplets = [];
+    this.droplet_phase = map(
+      this.droplet_lifespan,
+      this.DROPLET_LIFESPAN[0],
+      this.DROPLET_LIFESPAN[1],
+      25,
+      1
+    );
+    this.droplet_phaseCount = this.droplet_phase;
+    this.droplet_opacity = this.arc_opacity;
+    this.droplet_maxRadius = map(
+      this.droplet_lifespan,
+      this.DROPLET_LIFESPAN[0],
+      this.DROPLET_LIFESPAN[1],
+      0.05,
+      0.75
+    );
   }
 
   //--------------------------------------------------//
@@ -175,6 +204,31 @@ class Module {
         }
       }
     }
+
+    //--------------------------------------------------//
+    // Droplets
+    if (this.droplet_lifespan >= 0) {
+      if (this.droplet_phaseCount >= this.droplet_phase) {
+        this.addDroplet(
+          this.droplet_colors[int(random(this.droplet_colors.length))],
+          (TWO_PI / this.texture_segmentDivision) *
+            ceil(random(this.texture_segmentDivision))
+        );
+
+        this.droplet_phaseCount = 0;
+      } else {
+        this.droplet_phaseCount += FPS_RELATIVE_SPEED;
+      }
+
+      for (let i = this.droplets.length - 1; i >= 0; i--) {
+        let d = this.droplets[i];
+        d.update();
+
+        if (d.isDead) {
+          this.droplets.splice(i, 1);
+        }
+      }
+    }
   }
 
   //--------------------------------------------------//
@@ -204,6 +258,10 @@ class Module {
 
     for (let a of this.arcs) {
       a.display();
+    }
+
+    for (let d of this.droplets) {
+      d.display();
     }
   }
 
@@ -280,5 +338,19 @@ class Module {
     );
 
     this.arcs.push(a);
+  }
+
+  addDroplet(color, segment) {
+    let d = new Droplet(
+      this.droplet_lifespan,
+      this.droplet_lifespanRange,
+      color,
+      segment,
+      this.droplet_opacity,
+      this.texture_strokeWeight,
+      this.droplet_maxRadius
+    );
+
+    this.droplets.push(d);
   }
 }
