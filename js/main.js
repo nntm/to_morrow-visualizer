@@ -22,16 +22,9 @@ function updateModules() {
         json.entries[i].data_index,
         json.entries[i].id,
         json.entries[i].is_new,
-        coordinates[i],
+        coordinates[json.entries.length - i - 1],
         json.entries[i].visualization
       );
-
-      /*
-      console.log();
-      console.log(json.entries[i].index);
-      console.log(json.entries[i].instagram.link_to_original_post);
-      console.log(json.entries[i].instagram.username);
-      */
     }
   });
 
@@ -141,12 +134,6 @@ function setup() {
   modules = updateModules();
 
   calcSizes();
-
-  /*
-  setInterval(function () {
-    modules = updateModules();
-  }, REFRESH_INTERVAL);
-  */
 }
 
 //--------------------------------------------------//
