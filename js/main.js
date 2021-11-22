@@ -200,20 +200,33 @@ function draw() {
         frameRate() >= 5 ? (FPS_DEFAULT * 1.0) / frameRate() : 1;
 
     if (modules != null) {
-        // console.log(modules);
         push();
         translate(width / 2, height / 2);
 
         for (let i = 0; i < TOTAL_MODULE_COUNT; i++) {
+            modules[i].run();
+
             push();
             translate(modules[i].pos.x, modules[i].pos.y);
-            rotate(FRAME_COUNT * modules[i].rotationSpeed);
 
-            modules[i].run();
+            push();
+            rotate(FRAME_COUNT * modules[i].rotationSpeed);
             modules[i].display();
 
-            //modules[i].drawEnclosingShape();
-            //modules[i].drawIndex();
+            pop();
+
+            if (
+                dist(
+                    mouseX,
+                    mouseY,
+                    modules[i].pos.x + width / 2,
+                    modules[i].pos.y + height / 2
+                ) <= MODULE_RADIUS
+            ) {
+                // modules[i].drawEnclosingShape();
+                // modules[i].drawIndex();
+                modules[i].drawMetadataTooltip();
+            }
 
             pop();
         }
@@ -244,3 +257,54 @@ function countRings(n) {
 
     return rings;
 }
+
+//--------------------------------------------------//
+//--------------------------------------------------//
+//--------------------------------------------------//
+
+const dd = (date) => {
+    let a;
+    a = JSON.stringify(new Date(date).getDate());
+
+    return a < 10 ? `0${a}` : a;
+};
+
+// Month
+const mm = (date) => {
+    let a;
+    a = JSON.stringify(new Date(date).getMonth() + 1);
+
+    return a < 10 ? `0${a}` : a;
+};
+
+// Year
+const yy = (date) => {
+    let a;
+    a = JSON.stringify(new Date(date).getFullYear()).substring(2, 4);
+
+    return a < 10 ? `0${a}` : a;
+};
+
+// Hour
+const h = (date) => {
+    let a;
+    a = JSON.stringify(new Date(date).getHours());
+
+    return a < 10 ? `0${a}` : a;
+};
+
+// Minute
+const m = (date) => {
+    let a;
+    a = JSON.stringify(new Date(date).getMinutes());
+
+    return a < 10 ? `0${a}` : a;
+};
+
+// Second
+const s = (date) => {
+    let a;
+    a = JSON.stringify(new Date(date).getSeconds());
+
+    return a < 10 ? `0${a}` : a;
+};

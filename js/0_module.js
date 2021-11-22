@@ -84,6 +84,63 @@ class Module {
             0.05,
             0.75
         );
+
+        // Tooltip
+        this.TOOLTIP_TRANSFORM_Y = -20;
+        this.TOOLTIP_MAX_WIDTH = 200;
+        this.TOOLTIP_MAX_HEIGHT = 70;
+        this.TOOLTIP_TIP_WIDTH = 16;
+        this.TOOLTIP_TIP_HEIGHT = 8;
+        this.TOOLTIP_CORNER_RADIUS = 10;
+        this.TOOLTIP_PADDING = 10;
+        this.TOOLTIP_BACKGROUND_COLOR = 255;
+        this.TOOLTIP_BACKGROUND_OPACITY = 0.9;
+        this.TOOLTIP_TEXT_COLOR = 0;
+        this.TOOLTIP_TEXT_SIZE_RECUSRIVE = 12;
+        this.TOOLTIP_TEXT_SIZE_NEWSREADER = 15;
+
+        this.TOOLTIP_ID = "Outlook " + this.id.toUpperCase();
+        this.TOOLTIP_USERNAME = (function (
+            username,
+            textSize,
+            maxWidth,
+            padding
+        ) {
+            textFont(newsreader, textSize);
+            let str = "@" + username;
+            let isTrimmed = false;
+
+            while (textWidth(str + "…") > maxWidth - padding * 2) {
+                str = str.substring(0, str.length - 1);
+                isTrimmed = true;
+            }
+
+            if (!isTrimmed) return str;
+            else return str + "…";
+        })(
+            this.username,
+            this.TOOLTIP_TEXT_SIZE_NEWSREADER,
+            this.TOOLTIP_MAX_WIDTH,
+            this.TOOLTIP_PADDING
+        );
+        this.TOOLTIP_TIMESTAMP = (function (timestamp) {
+            let DATE_SEPARATOR = "/";
+            let TIME_SEPARATOR = ":";
+            return (
+                dd(timestamp) +
+                DATE_SEPARATOR +
+                mm(timestamp) +
+                DATE_SEPARATOR +
+                yy(timestamp) +
+                "  " +
+                h(timestamp) +
+                TIME_SEPARATOR +
+                m(timestamp) +
+                TIME_SEPARATOR +
+                s(timestamp) +
+                " GMT+7"
+            );
+        })(this.timestamp * 1000);
     }
 
     //--------------------------------------------------//
@@ -288,6 +345,111 @@ class Module {
         }
     }
 
+    //--------------------------------------------------//
+    //--------------------------------------------------//
+    //--------------------------------------------------//
+
+    drawMetadataTooltip() {
+        colorMode(RGB, 255, 255, 255, 1);
+
+        push();
+        translate(0, -(this.TOOLTIP_MAX_HEIGHT / 2 + MODULE_RADIUS + 10));
+
+        // Draw: Background
+        rectMode(CENTER);
+        fill(this.TOOLTIP_BACKGROUND_COLOR, this.TOOLTIP_BACKGROUND_OPACITY);
+        noStroke();
+        rect(
+            0,
+            0,
+            this.TOOLTIP_MAX_WIDTH,
+            this.TOOLTIP_MAX_HEIGHT,
+            this.TOOLTIP_CORNER_RADIUS
+        );
+
+        // Draw: Tip
+        fill(this.TOOLTIP_BACKGROUND_COLOR, this.TOOLTIP_BACKGROUND_OPACITY);
+        noStroke();
+        push();
+        translate(0, this.TOOLTIP_MAX_HEIGHT / 2);
+        triangle(
+            -this.TOOLTIP_TIP_WIDTH / 2,
+            0,
+            this.TOOLTIP_TIP_WIDTH / 2,
+            0,
+            0,
+            this.TOOLTIP_TIP_HEIGHT
+        );
+        pop();
+
+        // Draw: Outlook ID
+        noStroke();
+        fill(this.TOOLTIP_TEXT_COLOR);
+        textAlign(CENTER, TOP);
+        textFont(recursive, this.TOOLTIP_TEXT_SIZE_RECUSRIVE);
+        text(
+            this.TOOLTIP_ID,
+            0,
+            -this.TOOLTIP_MAX_HEIGHT / 2 + this.TOOLTIP_PADDING
+        );
+
+        // Draw: Username
+        noStroke();
+        fill(this.TOOLTIP_TEXT_COLOR);
+        textAlign(CENTER, CENTER);
+        textFont(newsreader, this.TOOLTIP_TEXT_SIZE_NEWSREADER);
+        text(this.TOOLTIP_USERNAME, 0, -1.5);
+
+        // Draw: Timestamp
+        noStroke();
+        fill(this.TOOLTIP_TEXT_COLOR);
+        textAlign(CENTER, BOTTOM);
+        textFont(recursive, this.TOOLTIP_TEXT_SIZE_RECUSRIVE);
+        text(
+            this.TOOLTIP_TIMESTAMP,
+            0,
+            this.TOOLTIP_MAX_HEIGHT / 2 - this.TOOLTIP_PADDING
+        );
+
+        pop();
+    }
+
+    //--------------------------------------------------//
+
+    drawIndex() {
+        noStroke();
+        fill(255);
+
+        textSize(MODULE_RADIUS * 0.5);
+        textAlign(CENTER, CENTER);
+
+        text(this.index, 0, 0);
+    }
+
+    //--------------------------------------------------//
+
+    drawEnclosingShape() {
+        noFill();
+        stroke(255);
+        strokeWeight(1);
+
+        beginShape();
+        for (
+            let a = HALF_PI;
+            a < TWO_PI + HALF_PI;
+            a += TWO_PI / MODULE_VERTEX_COUNT
+        ) {
+            let sx = cos(a) * MODULE_RADIUS;
+            let sy = sin(a) * MODULE_RADIUS;
+            vertex(sx, sy);
+        }
+        endShape(CLOSE);
+
+        ellipse(0, 0, MODULE_RADIUS * 2, MODULE_RADIUS * 2);
+    }
+
+    //--------------------------------------------------//
+    //--------------------------------------------------//
     //--------------------------------------------------//
 
     addPetal(color) {
