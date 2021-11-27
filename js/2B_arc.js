@@ -51,14 +51,14 @@ class Arc {
     update() {
         if (this.isClockwise) {
             this.a1 = map(
-                this.progress1,
+                constrain(this.progress1, 0, this.lifespan1),
                 0,
                 this.lifespan1,
                 this.begin,
                 this.end
             );
             this.a2 = map(
-                this.progress2,
+                constrain(this.progress2, 0, this.lifespan2),
                 0,
                 this.lifespan2,
                 this.begin,
@@ -77,14 +77,14 @@ class Arc {
             }
         } else {
             this.a1 = map(
-                this.progress1,
+                constrain(this.progress1, 0, this.lifespan1),
                 0,
                 this.lifespan1,
                 this.end,
                 this.begin
             );
             this.a2 = map(
-                this.progress2,
+                constrain(this.progress2, 0, this.lifespan2),
                 0,
                 this.lifespan2,
                 this.end,

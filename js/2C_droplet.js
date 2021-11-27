@@ -59,12 +59,7 @@ class Droplet {
 
     display() {
         noFill();
-        stroke(
-            red(this.color),
-            green(this.color),
-            blue(this.color),
-            this.opacity
-        );
+        stroke(this.color.r, this.color.g, this.color.b, this.opacity);
         strokeWeight(this.strokeWeight);
 
         push();

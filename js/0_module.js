@@ -445,7 +445,7 @@ class Module {
         }
         endShape(CLOSE);
 
-        ellipse(0, 0, MODULE_RADIUS * 2, MODULE_RADIUS * 2);
+        // ellipse(0, 0, MODULE_RADIUS * 2, MODULE_RADIUS * 2);
     }
 
     //--------------------------------------------------//

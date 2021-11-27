@@ -213,6 +213,9 @@ function draw() {
             rotate(FRAME_COUNT * modules[i].rotationSpeed);
             modules[i].display();
 
+            // modules[i].drawEnclosingShape();
+            // modules[i].drawIndex();
+
             pop();
 
             if (
@@ -223,8 +226,6 @@ function draw() {
                     modules[i].pos.y + height / 2
                 ) <= MODULE_RADIUS
             ) {
-                // modules[i].drawEnclosingShape();
-                // modules[i].drawIndex();
                 modules[i].drawMetadataTooltip();
             }
 
